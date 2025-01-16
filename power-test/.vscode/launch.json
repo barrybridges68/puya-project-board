@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "J-Link",
+      "type": "cortex-debug",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "executable": "${workspaceRoot}/build/py32-power.elf",
+      "servertype": "jlink",
+      "device": "PY32F003x6",
+      "svdFile": "CMSIS/Device/PY32F0xx/py32f003xx.svd",
+      "preLaunchTask": "Build",
+      "gdbPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/bin/arm-none-eabi-gdb.exe"
+      
+    },
+
+  ]
+}
