@@ -17,5 +17,6 @@ extern volatile uint8_t g_button_press;
  */
 void NVIC_Config(void);
 
+void NVIC_Disable(void);
 
 #endif // INTERRUPTS_H

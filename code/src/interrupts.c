@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "py32f0xx.h"
+#include "py32f0xx_hal.h"
 #include "py32f0xx_ll_gpio.h"
 #include "py32f0xx_hal_spi.h"
 #include "py32f0xx_ll_cortex.h"
@@ -32,6 +33,10 @@ void SysTick_Handler()
     HAL_IncTick();
 }
 
+void HardFault_Handler(void)
+{
+    while(1);
+}
 
 /**
  * @brief Configures the Nested Vectored Interrupt Controller (NVIC).
@@ -45,18 +50,32 @@ void SysTick_Handler()
  */
 void NVIC_Config(void)
 {
+    //EXTI->PR = EXTI_PR_PR0 | EXTI_PR_PR1 | EXTI_PR_PR2 | EXTI_PR_PR3 | EXTI_PR_PR4 | EXTI_PR_PR12;
+    EXTI->PR = EXTI_PR_PR7;
     // Set priority
-    NVIC_SetPriority(EXTI0_1_IRQn, 0);
-    NVIC_SetPriority(EXTI2_3_IRQn, 1);
+    //NVIC_SetPriority(EXTI0_1_IRQn, 0);
+    //NVIC_SetPriority(EXTI2_3_IRQn, 1);
     NVIC_SetPriority(EXTI4_15_IRQn, 2);  
     
     // Enable IRQ
-    NVIC_EnableIRQ(EXTI0_1_IRQn);
-    NVIC_EnableIRQ(EXTI2_3_IRQn);   
+    //NVIC_EnableIRQ(EXTI0_1_IRQn);
+    //NVIC_EnableIRQ(EXTI2_3_IRQn);   
     NVIC_EnableIRQ(EXTI4_15_IRQn);
 
     /* Clear all exti interrupts */
-    EXTI->PR = EXTI_PR_PR0 | EXTI_PR_PR1 | EXTI_PR_PR2 | EXTI_PR_PR3 | EXTI_PR_PR4 | EXTI_PR_PR12;
+    //EXTI->PR = EXTI_PR_PR0 | EXTI_PR_PR1 | EXTI_PR_PR2 | EXTI_PR_PR3 | EXTI_PR_PR4 | EXTI_PR_PR12;
+    EXTI->PR = EXTI_PR_PR7;
+}
+
+
+void NVIC_Disable(void)
+{
+    //NVIC_DisableIRQ(EXTI0_1_IRQn);
+    //NVIC_DisableIRQ(EXTI2_3_IRQn);
+    NVIC_DisableIRQ(EXTI4_15_IRQn);
+    /* Clear all exti interrupts */
+    //EXTI->PR = EXTI_PR_PR0 | EXTI_PR_PR1 | EXTI_PR_PR2 | EXTI_PR_PR3 | EXTI_PR_PR4 | EXTI_PR_PR12; 
+    EXTI->PR = EXTI_PR_PR7;   
 }
 
 /**
@@ -74,7 +93,7 @@ void EXTI0_1_IRQHandler(void)
 {
     volatile uint32_t irqs = EXTI->PR;
     
-    NVIC_DisableIRQ(EXTI0_1_IRQn);
+    NVIC_Disable();
 
     // Check if the interrupt was triggered by PF0
     if (irqs & EXTI_PR_PR0)
@@ -112,6 +131,9 @@ void EXTI0_1_IRQHandler(void)
 void EXTI2_3_IRQHandler(void)
 {
     volatile uint32_t irqs = EXTI->PR;
+
+    NVIC_Disable();
+
     if (irqs & EXTI_PR_PR2)
     {
         // Clear the interrupt flag
@@ -148,23 +170,33 @@ void EXTI2_3_IRQHandler(void)
 void EXTI4_15_IRQHandler(void)
 {
     volatile uint32_t irqs = EXTI->PR;
-    if (irqs & EXTI_PR_PR4)
+    if (irqs & EXTI_PR_PR7)
     {
         // Clear the interrupt flag
-        EXTI->PR |= EXTI_PR_PR4;
+        EXTI->PR |= EXTI_PR_PR7;
         
-        g_button_press = 0x10;
+        g_button_press = 0x02;
         return;
     }
 
-    if (irqs & EXTI_PR_PR12)
+    if (irqs & EXTI_PR_PR6)
     {
         // Clear the interrupt flag
-        EXTI->PR |= EXTI_PR_PR12;
+        EXTI->PR |= EXTI_PR_PR6;
         
-        g_button_press = 0x20;
+        g_button_press = 0x01;
         return;
-    }    
+    }
+
+    if (irqs & EXTI_PR_PR5)
+    {
+        // Clear the interrupt flag
+        EXTI->PR |= EXTI_PR_PR5;
+        
+        g_button_press = 0x03;
+        return;
+    }
+
 }
 
 // Add your interrupt service routines here

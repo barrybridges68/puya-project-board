@@ -17,7 +17,10 @@
     "py32f0xx_hal.h": "c",
     "rf24.h": "c",
     "py32f0xx_ll_spi.h": "c",
-    "py32f0xx_ll_i2c.h": "c"
+    "py32f0xx_ll_i2c.h": "c",
+    "interrupts.h": "c",
+    "globals.h": "c",
+    "py32f0xx_ll_utils.h": "c"
   },
   "cortex-debug.variableUseNaturalFormat": false,
   "C_Cpp_Runner.cCompilerPath": "gcc",

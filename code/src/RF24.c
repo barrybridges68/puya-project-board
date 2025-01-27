@@ -13,6 +13,12 @@
 #include "py32f0xx_ll_spi.h"
 #include "py32f0xx_ll_bus.h"
 
+
+
+#include "globals.h"
+#include "utils.h"
+#include "bandgap.h"
+
 uint8_t wide_band;                /* 2Mbs data rate in use? */
 uint8_t p_variant;                /* False for RF24L01 and true for RF24L01P */
 uint8_t payload_size;             /**< Fixed size of payloads */
@@ -1014,15 +1020,18 @@ uint8_t makePacketChecksum ( uint8_t * packet, uint8_t length )
 uint32_t count = 0;
 void nrf_send(uint8_t buttons)
 {
+	    // Measure the band gap voltage
+    uint8_t battery_voltage = (MeasureBandGapVoltage() / 100);
+
 	powerUp();
 		/* Reset the counter to 0 */
 	send_packet.mHeader.mCounter = count++;
 	/* Re-read in case changed in registration */
-	send_packet.mHeader.mNodeId  = 0x1234;	
+	send_packet.mHeader.mNodeId = Read_UID();	
 	send_packet.mHeader.mVersion = 4;
 	send_packet.mHeader.mStart = PACKET_START;
 	send_packet.mHeader.mPacketType = ePacketTypeTrigger;
-	send_packet.mHeader.mBatteryVolts = 0x21;
+	send_packet.mHeader.mBatteryVolts = battery_voltage;
 	send_packet.mTriggerData.triggerstate = buttons;
 	send_packet.mChecksum = 0x00;
 	send_packet.mChecksum = makePacketChecksum((uint8_t*)&send_packet, sizeof(send_packet));
