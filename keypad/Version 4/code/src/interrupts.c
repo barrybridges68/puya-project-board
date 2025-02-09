@@ -15,6 +15,7 @@
 #include "py32f0xx_ll_gpio.h"
 #include "py32f0xx_hal_spi.h"
 #include "py32f0xx_ll_cortex.h"
+#include "rtc.h"
 
 volatile uint8_t g_button_press = 0;
 
@@ -51,7 +52,7 @@ void HardFault_Handler(void)
 void NVIC_Config(void)
 {
     //EXTI->PR = EXTI_PR_PR0 | EXTI_PR_PR1 | EXTI_PR_PR2 | EXTI_PR_PR3 | EXTI_PR_PR4 | EXTI_PR_PR12;
-    EXTI->PR = EXTI_PR_PR7;
+    EXTI->PR = EXTI_PR_PR7 | EXTI_PR_PR4;
     // Set priority
     //NVIC_SetPriority(EXTI0_1_IRQn, 0);
     //NVIC_SetPriority(EXTI2_3_IRQn, 1);
@@ -64,7 +65,7 @@ void NVIC_Config(void)
 
     /* Clear all exti interrupts */
     //EXTI->PR = EXTI_PR_PR0 | EXTI_PR_PR1 | EXTI_PR_PR2 | EXTI_PR_PR3 | EXTI_PR_PR4 | EXTI_PR_PR12;
-    EXTI->PR = EXTI_PR_PR7;
+    EXTI->PR = EXTI_PR_PR7 | EXTI_PR_PR4;
 }
 
 
@@ -196,6 +197,15 @@ void EXTI4_15_IRQHandler(void)
         g_button_press = 0x03;
         return;
     }
+
+    if (irqs & EXTI_PR_PR4)
+    {
+        // Clear the interrupt flag
+        EXTI->PR |= EXTI_PR_PR4;
+        rtc_time.utc_s++;
+
+        return;
+    }    
 
 }
 

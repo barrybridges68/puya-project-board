@@ -67,6 +67,7 @@ typedef struct
     uint64_t utc_s;            ///< Number of seconds since 1970-01-01 00:00:00, Linux Epoch time, UTC
     int32_t  zone_offset_s;    ///< Number of seconds offset from UTC
 } rtc_time_t;
+extern rtc_time_t rtc_time;
 
 void i2c_init(void);
 void rtc_init(void);

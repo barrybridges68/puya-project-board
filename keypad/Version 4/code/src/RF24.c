@@ -1,4 +1,4 @@
-
+/* System includes */
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -13,11 +13,11 @@
 #include "py32f0xx_ll_spi.h"
 #include "py32f0xx_ll_bus.h"
 
-
-
+/* Project includes */
 #include "globals.h"
 #include "utils.h"
 #include "bandgap.h"
+#include "spi.h"
 
 uint8_t wide_band;                /* 2Mbs data rate in use? */
 uint8_t p_variant;                /* False for RF24L01 and true for RF24L01P */
@@ -27,17 +27,20 @@ uint8_t dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */
 uint8_t ack_payload_length;       /**< Dynamic size of pending ack payload. */
 uint8_t pipe0_reading_address[5] = {0,0,0,0,0}; /**< Last address set on pipe 0 for reading. */
 
+/* Definitions */
 #define CSN_PORT GPIOA
 #define CE_PORT  GPIOA
 
 #define CSN LL_GPIO_PIN_6
 #define CE  LL_GPIO_PIN_5
 
-SPI_HandleTypeDef spi1_handle;
+
+/* Variables */
 HAL_StatusTypeDef status;
 sTriggerPacket send_packet;
 
-void APP_SPIConfig(void)
+/* Functions */
+void io_init(void)
 {
 	__HAL_RCC_GPIOA_CLK_ENABLE();
     // Configure CSN pin
@@ -52,52 +55,10 @@ void APP_SPIConfig(void)
 	LL_GPIO_SetPinOutputType(CE_PORT, CE, LL_GPIO_OUTPUT_PUSHPULL);
 	LL_GPIO_SetPinPull(CE_PORT, CE, LL_GPIO_PULL_NO);
 
-    // Configure SPI1 SCK (PA1), MISO (PA0), and MOSI (PA7) pins
-    LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_1, LL_GPIO_MODE_ALTERNATE);
-    LL_GPIO_SetAFPin_0_7(GPIOA, LL_GPIO_PIN_1, LL_GPIO_AF_0);
-    LL_GPIO_SetPinSpeed(GPIOA, LL_GPIO_PIN_1, LL_GPIO_SPEED_FREQ_HIGH);
-    LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_1, LL_GPIO_PULL_NO);
-
-    LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_0, LL_GPIO_MODE_ALTERNATE);
-    LL_GPIO_SetAFPin_0_7(GPIOA, LL_GPIO_PIN_0, LL_GPIO_AF_10);
-    LL_GPIO_SetPinSpeed(GPIOA, LL_GPIO_PIN_0, LL_GPIO_SPEED_FREQ_HIGH);
-    LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_0, LL_GPIO_PULL_NO);
-
-    LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_7, LL_GPIO_MODE_ALTERNATE);
-    LL_GPIO_SetAFPin_0_7(GPIOA, LL_GPIO_PIN_7, LL_GPIO_AF_0);
-    LL_GPIO_SetPinSpeed(GPIOA, LL_GPIO_PIN_7, LL_GPIO_SPEED_FREQ_HIGH);
-    LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_7, LL_GPIO_PULL_NO);
-    
-	__HAL_RCC_SPI1_CLK_ENABLE();
-    // Configure SPI1
-	HAL_SPI_DeInit(&spi1_handle);
-    spi1_handle.Instance = SPI1;
-    spi1_handle.Init.Mode = SPI_MODE_MASTER;
-    spi1_handle.Init.Direction = SPI_DIRECTION_2LINES;
-    spi1_handle.Init.DataSize = SPI_DATASIZE_8BIT;
-    spi1_handle.Init.CLKPolarity = SPI_POLARITY_LOW;
-    spi1_handle.Init.CLKPhase = SPI_PHASE_1EDGE;
-    spi1_handle.Init.NSS = SPI_NSS_SOFT;
-    spi1_handle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
-    spi1_handle.Init.FirstBit = SPI_FIRSTBIT_MSB;
-
-    if (HAL_SPI_Init(&spi1_handle) != HAL_OK)
-    {
-        // Initialization Error
-        __NOP();
-    }
-
     // Set CSN high
     LL_GPIO_SetOutputPin(CSN_PORT, CSN);
     // Clear CE low
     LL_GPIO_ResetOutputPin(CE_PORT, CE);
-}
-
-uint8_t spi_transfer(uint8_t spiData)
-{
-	uint8_t result;
-	HAL_SPI_TransmitReceive(&spi1_handle, &spiData, &result,1 ,10);
-	return result;
 }
 
 uint8_t min(uint8_t a, uint8_t b)
@@ -317,7 +278,7 @@ bool id_chip_connected( void )
 }
 /****************************************************************************/
 
-void begin(void)
+void nrf24_init(void)
 {
 	ce(LOW);
 	csn(HIGH);
@@ -444,7 +405,7 @@ void powerUp(void)
 uint8_t write(const void *buf, uint8_t len)
 {
 	uint8_t result = FALSE;
-	uint8_t observe_tx;
+	//uint8_t observe_tx;
 	uint8_t status;
 	uint8_t tx_ok;
 	uint8_t tx_fail;
@@ -992,7 +953,8 @@ uint8_t rfbuff[28];
 
 void nrf_init(void)
 {
-	begin();
+	io_init();
+	nrf24_init();
     setPayloadSize(24);
     setChannel(60);
     setDataRate(RF24_250KBPS);

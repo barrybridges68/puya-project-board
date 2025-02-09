@@ -34,6 +34,11 @@
 #include "bandgap.h"
 #include "lfs.h"
 #include "lfs_util.h"
+#include "spi.h"
+#include "utils.h"
+#include "flash.h" /* Remove */
+#include "lfs_interface.h"
+#include "rtc.h"
 
 #if INCLUDE_SERIAL    
     #include "uart.h"
@@ -205,60 +210,32 @@ int main (void)
 
     /* Set the option to treat the RESET line as GPIO */
     ResetOptionBytesToDefault();
+
     __HAL_RCC_PWR_CLK_ENABLE();
 
     /* Configure the IO */
     APP_GPIO_Config();
 
-    // Configure the ADC
+    /* Configure the ADC */
     APP_ADCConfig();
 
-// variables used by the filesystem
-lfs_t lfs;
-lfs_file_t file;
-
-// configuration of the filesystem is provided by this struct
-const struct lfs_config cfg = {
-    // block device operations
-    .read  = NULL,
-    .prog  = NULL,
-    .erase = NULL,
-    .sync  = NULL,
-
-    // block device configuration
-    .read_size = 16,
-    .prog_size = 16,
-    .block_size = 4096,
-    .block_count = 128,
-    .cache_size = 16,
-    .lookahead_size = 16,
-    .block_cycles = 500,
-};
-
-    // mount the filesystem
-    int err = lfs_mount(&lfs, &cfg);
-
-    // reformat if we can't mount the filesystem
-    // this should only happen on the first boot
-    if (err) {
-        lfs_format(&lfs, &cfg);
-        lfs_mount(&lfs, &cfg);
-    }
-
+    /* Configure the SPI for the radio */
+    APP_SPIConfig();
+    
+    little_fs_init();
 
     /* Configure the I2C and RTC */
-    //i2c_init();
-    //rtc_init();
+    i2c_init();
+    rtc_init();
 
 #if INCLUDE_SERIAL    
     APP_USARTConfig();
 #endif
 
-    /* Configure the SPI for the radio */
-    APP_SPIConfig();
+
 
     /* Configure the radio */
-    nrf_init();
+    //nrf_init();
 
     /* Small start-up delay */
     HAL_Delay(100);
@@ -271,13 +248,13 @@ const struct lfs_config cfg = {
         status = HAL_UART_Receive(&UartHandle, &a, 1, 0);
 #endif
         /* Place the device into sleep mode */
-        EnterLowPowerMode();
+        //EnterLowPowerMode();
 
         /* Small debouce delay */
         if ((buttons = debounce_buttons()) != 0)
         { 
             /* Send the required data */
-            nrf_send(buttons);
+           // nrf_send(buttons);
             
             EXTI->PR |= EXTI_PR_PR1;
             g_button_press = 0;

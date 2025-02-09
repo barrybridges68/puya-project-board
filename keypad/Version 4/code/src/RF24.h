@@ -35,10 +35,10 @@ typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_e;
  */
 typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e;
 
-extern SPI_HandleTypeDef spi1_handle;
+
 extern uint8_t rfbuff[28];
 
-void APP_SPIConfig(void);
+
 void nrf_init(void);
 uint8_t min( uint8_t a, uint8_t b);
 void csn(uint8_t mode);
@@ -56,7 +56,7 @@ uint8_t get_status(void);
 void setChannel(uint8_t channel);
 void setPayloadSize(uint8_t size);
 uint8_t getPayloadSize(void);
-void begin(void);
+void nrf24_init(void);
 void startListening(void);
 void stopListening(void);
 void powerDown(void);

@@ -15,12 +15,28 @@ rtc_time_t rtc_time;
 rtc_date_time_t rtc_date_time;
 #define PCF8563T_MASTER_ADDRESS 0xA2
 
+#define RTC_INT_PORT  GPIOA
+#define RTC_INT_PIN   LL_GPIO_PIN_4
+
+uint32_t rtc_get_seconds(void)
+{
+    return rtc_time.utc_s;
+}
+
 void i2c_init(void)
 {
     LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
     LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOF);
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C1);
+
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+    // Configure RTC_INT pin (PA4)
+    GPIO_InitStruct.Pin   = RTC_INT_PIN;
+    GPIO_InitStruct.Mode  = GPIO_MODE_IT_RISING;
+    GPIO_InitStruct.Pull  = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(RTC_INT_PORT, &GPIO_InitStruct);
 
     // PF1 SCL
     GPIO_InitStruct.Pin = LL_GPIO_PIN_1;
@@ -38,7 +54,6 @@ void i2c_init(void)
 
     LL_APB1_GRP1_ForceReset(LL_APB1_GRP1_PERIPH_I2C1);
     LL_APB1_GRP1_ReleaseReset(LL_APB1_GRP1_PERIPH_I2C1);
-
 
     I2cHandle.Instance             = I2C1;
     I2cHandle.Init.ClockSpeed      = 100000;        // 100KHz ~ 400KHz
