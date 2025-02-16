@@ -8,11 +8,12 @@
             "cwd": "${workspaceRoot}",
             "executable": "build/${workspaceFolderBasename}.elf",
             "servertype": "jlink",
+            "serverArgs": ["-speed", "100"],
             "device": "PY32F003x8", 
             "svdFile": "CMSIS/Device/PY32F0xx/py32f003xx.svd",
             "preLaunchTask": "Build",
             //"showDevDebugOutput": "parsed",
-            "gdbPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/bin/arm-none-eabi-gdb.exe",
+            "gdbPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/bin/arm-none-eabi-gdb.exe",            
         }
     ]
 }

@@ -76,7 +76,7 @@ void NVIC_Disable(void)
     NVIC_DisableIRQ(EXTI4_15_IRQn);
     /* Clear all exti interrupts */
     //EXTI->PR = EXTI_PR_PR0 | EXTI_PR_PR1 | EXTI_PR_PR2 | EXTI_PR_PR3 | EXTI_PR_PR4 | EXTI_PR_PR12; 
-    EXTI->PR = EXTI_PR_PR7;   
+    EXTI->PR = EXTI_PR_PR7 | EXTI_PR_PR4 ;   
 }
 
 /**
@@ -94,7 +94,7 @@ void EXTI0_1_IRQHandler(void)
 {
     volatile uint32_t irqs = EXTI->PR;
     
-    NVIC_Disable();
+
 
     // Check if the interrupt was triggered by PF0
     if (irqs & EXTI_PR_PR0)
@@ -133,7 +133,6 @@ void EXTI2_3_IRQHandler(void)
 {
     volatile uint32_t irqs = EXTI->PR;
 
-    NVIC_Disable();
 
     if (irqs & EXTI_PR_PR2)
     {
@@ -171,6 +170,8 @@ void EXTI2_3_IRQHandler(void)
 void EXTI4_15_IRQHandler(void)
 {
     volatile uint32_t irqs = EXTI->PR;
+
+
     if (irqs & EXTI_PR_PR7)
     {
         // Clear the interrupt flag

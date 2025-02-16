@@ -1,3 +1,5 @@
+#ifndef RTC_H
+#define RTC_H
 
 #define RTC_CONTROL_1_NORMAL    0x00U
 #define RTC_CONTROL_1_STOP      (1U<<5U)
@@ -71,3 +73,73 @@ extern rtc_time_t rtc_time;
 
 void i2c_init(void);
 void rtc_init(void);
+
+/**
+ * @fn bool rtc_update_time(uint8_t hour, uint8_t min, uint8_t sec)
+ * @brief Updates time only
+ *
+ * @param [in]  hour bcd format
+ * @param [in]  min  bcd format
+ * @param [in]  sec  bcd format
+ * @return      true if successful
+ */
+bool rtc_update_time(uint8_t hour, uint8_t min, uint8_t sec);
+
+/**
+ * @fn rtc_date_time_t rtc_sec_to_date_time(rtc_time_t seconds)
+ * @brief Convert unix epoch time in seconds to date time in BCD format
+ *
+ * Code from fsl_rtc.c RTC_ConvertSecondsToDatetime(). Modified to be 64 bit.
+ *
+ * Not efficient but only used when setting a new time date in the RTC,
+ * so not time critical.
+ *
+ * @param [in]  seconds
+ * @return      srtc_date_time_t
+ */
+rtc_date_time_t rtc_sec_to_date_time(uint64_t seconds);
+
+/**
+ * @fn rtc_date_time_t rtc_sec_to_date_time_str(uint64_t seconds, char* date_time_str)
+ * @brief Convert unix epoch time in seconds to date time into string format
+ *
+ *
+ * @param [in]  seconds - epoch seconds
+ * @param [in]  date_time_str - char buffer for the formated string.
+ * @return      srtc_date_time_t
+ */
+rtc_date_time_t rtc_sec_to_date_time_str(uint64_t seconds, char* date_time_str);
+
+/* @fn bool rtc_set_time(rtc_time_t* rtc_time)
+ * @brief Set the RTC time
+ *
+ * @param[in]   rtc_time_t*
+ * @return      true if success, false otherwise
+ */
+bool rtc_set_time(rtc_time_t* rtc_time);
+
+/**
+ * @fn rtc_time_t rtc_date_time_to_sec(rtc_date_time_t date_time_in)
+ * @brief Convert date time in BCD format to unix epoch time in seconds
+ *
+ * Code from fsl_rtc.c RTC_ConvertDatetimeToSeconds(). Modified to be 64 bit.
+ *
+ * @param [in]  uint64_t
+ * @return      seconds
+ */
+uint64_t rtc_date_time_to_sec(rtc_date_time_t date_time_in);
+
+uint32_t rtc_get_seconds(void);
+
+/**
+ * @fn bool rtc_update_date(uint8_t year, uint8_t month, uint8_t day)
+ * @brief Updates date only
+ *
+ * @param [in]  year  bcd format
+ * @param [in]  month bcd format
+ * @param [in]  day   bcd format
+ * @return      true if successful
+ */
+bool rtc_update_date(uint8_t year, uint8_t month, uint8_t day);
+
+#endif /* RTC_H */

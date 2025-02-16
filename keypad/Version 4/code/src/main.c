@@ -39,12 +39,14 @@
 #include "flash.h" /* Remove */
 #include "lfs_interface.h"
 #include "rtc.h"
+#include "command_line.h"
 
-#if INCLUDE_SERIAL    
-    #include "uart.h"
-#endif
+
+#include "uart.h"
 
 #define DEBOUNCE_TIME_MS 20 // May not be 20ms at given clock rate
+
+//void debug_console(void);
 
 /**
  * @brief Configures the GPIO pins for the application.
@@ -66,7 +68,7 @@ static void APP_GPIO_Config(void)
     // HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    GPIO_InitStruct.Pin   = IO_3 | IO_4 | IO_1;
+    GPIO_InitStruct.Pin   = IO_3 | IO_1;
     GPIO_InitStruct.Mode  = GPIO_MODE_IT_RISING;
     GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -228,45 +230,46 @@ int main (void)
     i2c_init();
     rtc_init();
 
-#if INCLUDE_SERIAL    
+    /*Setup the serial port */
     APP_USARTConfig();
-#endif
 
-
+    /* Confiure the interrupts */
+    NVIC_Config();
 
     /* Configure the radio */
     //nrf_init();
 
     /* Small start-up delay */
     HAL_Delay(100);
-    uint8_t buttons;
+
+    //run_basic();
+    debug_console();
     /* Main loop */
     while(1)
     {
-#if INCLUDE_SERIAL   
-        HAL_UART_Transmit(&UartHandle,&a,1,100);
-        status = HAL_UART_Receive(&UartHandle, &a, 1, 0);
-#endif
-        /* Place the device into sleep mode */
-        //EnterLowPowerMode();
+         //HAL_UART_Transmit(&UartHandle, &buttons, 1, 100);
+       
 
-        /* Small debouce delay */
-        if ((buttons = debounce_buttons()) != 0)
-        { 
-            /* Send the required data */
-           // nrf_send(buttons);
+    //     /* Place the device into sleep mode */
+    //     //EnterLowPowerMode();
+
+    //     // /* Small debouce delay */
+    //     // if ((buttons = debounce_buttons()) != 0)
+    //     // { 
+    //     //     /* Send the required data */
+    //     //    // nrf_send(buttons);
             
-            EXTI->PR |= EXTI_PR_PR1;
-            g_button_press = 0;
-        }
+    //     //     EXTI->PR |= EXTI_PR_PR1;
+    //     //     g_button_press = 0;
+    //     // }
 
-        /* Re-enable the IRQ's. 
-         * This is done to prevent the IRQ from being triggered multiple times.
-         * Note: Delays seem to be needed, but not sure why. Proably best 
-         * not to remove them.
-         */
-        HAL_Delay(10);
-        NVIC_Config();
+    //     // /* Re-enable the IRQ's. 
+    //     //  * This is done to prevent the IRQ from being triggered multiple times.
+    //     //  * Note: Delays seem to be needed, but not sure why. Proably best 
+    //     //  * not to remove them.
+    //     //  */
+    //     // HAL_Delay(10);
+
         HAL_Delay(100);
     }
 }

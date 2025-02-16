@@ -21,7 +21,12 @@
     "interrupts.h": "c",
     "globals.h": "c",
     "py32f0xx_ll_utils.h": "c",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "lfs_interface.h": "c",
+    "uart.h": "c",
+    "command_line.h": "c",
+    "py32f0xx_hal_def.h": "c",
+    "py32f0xx_ll_rcc.h": "c"
   },
   "cortex-debug.variableUseNaturalFormat": false,
   "C_Cpp_Runner.cCompilerPath": "gcc",

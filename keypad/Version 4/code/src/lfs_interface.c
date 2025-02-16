@@ -40,7 +40,7 @@ const struct lfs_config cfg = {
     .read_size = 16,
     .prog_size = 16,
     .block_size = 4096,
-    .block_count = 128,
+    .block_count = 64,
     .cache_size = 16,
     .lookahead_size = 16,
     .block_cycles = 500,
@@ -52,6 +52,8 @@ int little_fs_init(void)
     /* Get the flash ready */
     flash_power_up();
     
+    //flash_erase_chip();
+
     /* Mount the filesystem */
     int err = lfs_mount(&lfs, &cfg);
 
@@ -73,7 +75,7 @@ int little_fs_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off,
 
 int little_fs_write(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size)
 {
-    return flash_write(((block * c->block_size) + off), buffer, size);
+    return flash_write(((block * c->block_size) + off), (uint8_t*)buffer, size);
 }
 
 int little_fs_erase(const struct lfs_config *c, lfs_block_t block)

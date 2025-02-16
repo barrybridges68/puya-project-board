@@ -31,7 +31,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "py32f0xx.h"
 
-#define USE_FULL_LL_DRIVER
+
 
 /** @addtogroup PY32F0xx_LL_Driver
   * @{

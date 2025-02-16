@@ -48,7 +48,7 @@ void APP_SPIConfig(void)
     spi1_handle.Init.CLKPolarity = SPI_POLARITY_LOW;
     spi1_handle.Init.CLKPhase = SPI_PHASE_1EDGE;
     spi1_handle.Init.NSS = SPI_NSS_SOFT;
-    spi1_handle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+    spi1_handle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
     spi1_handle.Init.FirstBit = SPI_FIRSTBIT_MSB;
 
     if (HAL_SPI_Init(&spi1_handle) != HAL_OK)

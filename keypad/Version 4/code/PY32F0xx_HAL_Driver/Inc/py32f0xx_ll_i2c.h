@@ -23,7 +23,7 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __PY32F0xx_LL_I2C_H
 #define __PY32F0xx_LL_I2C_H
-#define USE_FULL_LL_DRIVER
+
 #ifdef __cplusplus
 extern "C" {
 #endif
